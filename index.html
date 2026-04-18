@@ -66,7 +66,7 @@
   <label>姓名</label>
   <input id="name" type="text" required>
 
-  <label>電話（10 碼）</label>
+  <label>電話</label>
   <input id="phone" type="tel" maxlength="10" placeholder="0912345678">
 
   <label>匯款後 5 碼</label>
@@ -112,30 +112,47 @@ function submitForm() {
   const time = document.getElementById("time").value;
   const msg = document.getElementById("message");
 
-  // 前端檢查（先擋錯）
-  if (!name || phone.length !== 10 || paycode.length !== 5) {
+  // 簡單前台檢查（輔助用）
+  if (!name || !phone || !paycode || !date || !time) {
     msg.style.color = "red";
-    msg.innerText = "請完整填寫正確資料";
+    msg.innerText = "請填寫所有欄位";
     return;
   }
 
   msg.style.color = "blue";
-  msg.innerText = "送出中（目前尚未連接後端）";
+  msg.innerText = "送出預約中...";
 
-  // 🔜 未來你會在這裡呼叫後端 API
-  /*
-  fetch("https://你的後端網址/reserve", {
+  fetch("https://hairbooking-backend.onrender.com/reserve", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, phone, paycode, date, time })
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name: name,
+      phone: phone,
+      paycode: paycode,
+      date: date,
+      time: time
+    })
   })
-  .then(res => res.json())
+  .then(async res => {
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.detail || "預約失敗");
+    }
+    return data;
+  })
   .then(data => {
-    msg.innerText = data.message;
+    msg.style.color = "green";
+    msg.innerText = data.message || "✅ 預約成功";
   })
-  */
+  .catch(err => {
+    msg.style.color = "red";
+    msg.innerText = err.message;
+  });
 }
 </script>
+
 
 </body>
 </html>
