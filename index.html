@@ -77,11 +77,6 @@
       padding: 14px;
       font-size: 17px;
       cursor: pointer;
-      transition: background 0.2s ease;
-    }
-
-    button:hover {
-      background: var(--primary-dark);
     }
 
     .message {
@@ -126,24 +121,34 @@
 
 <script>
 const BACKEND = "https://hairbooking-backend.onrender.com";
+const WEEKDAY = ["日","一","二","三","四","五","六"];
 
 const dateSelect = document.getElementById("dateSelect");
 const timeSelect = document.getElementById("timeSelect");
 const msg = document.getElementById("message");
 
-// ✅ 載入可預約日期
+// ✅ 產生「固定寬度日期 + 星期」
+function formatDateLabel(isoDate) {
+  const d = new Date(isoDate);
+  const m = d.getMonth() + 1;
+  const day = String(d.getDate()).padStart(2, "0"); // ✅ 補 0
+  const w = WEEKDAY[d.getDay()];
+  return `${m}月${day}日（${w}）`;
+}
+
+// ✅ 載入日期
 fetch(`${BACKEND}/available-dates`)
   .then(r => r.json())
   .then(list => {
     list.forEach(d => {
       const opt = document.createElement("option");
       opt.value = d.value;
-      opt.textContent = d.label;
+      opt.textContent = formatDateLabel(d.value);
       dateSelect.appendChild(opt);
     });
   });
 
-// ✅ 日期變更 → 載入時間
+// ✅ 日期選擇 → 載入時間
 dateSelect.addEventListener("change", () => {
   timeSelect.innerHTML = '<option value="">請選擇時間</option>';
   const date = dateSelect.value;
@@ -169,26 +174,15 @@ dateSelect.addEventListener("change", () => {
     });
 });
 
-// ✅【重點修正】不要直接用 name.value
+// ✅ 送出
 function submitForm() {
-  const nameEl = document.getElementById("name");
-  const phoneEl = document.getElementById("phone");
-  const paycodeEl = document.getElementById("paycode");
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const paycode = document.getElementById("paycode").value.trim();
 
-  msg.className = "message";
-  msg.textContent = "";
-
-  const data = {
-    name: nameEl.value.trim(),
-    phone: phoneEl.value.trim(),
-    paycode: paycodeEl.value.trim(),
-    date: dateSelect.value,
-    time: timeSelect.value
-  };
-
-  if (!data.name || !data.phone || !data.paycode || !data.date || !data.time) {
+  if (!name || !phone || !paycode || !dateSelect.value || !timeSelect.value) {
     msg.textContent = "請完整填寫所有欄位";
-    msg.classList.add("error");
+    msg.className = "message error";
     return;
   }
 
@@ -197,11 +191,15 @@ function submitForm() {
   fetch(`${BACKEND}/reserve`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+    body: JSON.stringify({
+      name, phone, paycode,
+      date: dateSelect.value,
+      time: timeSelect.value
+    })
   })
-  .then(async res => {
-    const j = await res.json();
-    if (!res.ok) throw j;
+  .then(async r => {
+    const j = await r.json();
+    if (!r.ok) throw j;
     msg.textContent = "✅ 預約成功";
     msg.className = "message success";
   })
@@ -214,3 +212,4 @@ function submitForm() {
 
 </body>
 </html>
+``
