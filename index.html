@@ -67,10 +67,6 @@
       box-shadow: 0 0 0 2px rgba(180,138,99,0.15);
     }
 
-    select option {
-      padding: 10px;
-    }
-
     button {
       width: 100%;
       margin-top: 28px;
@@ -135,7 +131,7 @@ const dateSelect = document.getElementById("dateSelect");
 const timeSelect = document.getElementById("timeSelect");
 const msg = document.getElementById("message");
 
-// 載入可預約日期
+// ✅ 載入可預約日期
 fetch(`${BACKEND}/available-dates`)
   .then(r => r.json())
   .then(list => {
@@ -147,7 +143,7 @@ fetch(`${BACKEND}/available-dates`)
     });
   });
 
-// 日期變更 → 載入時間
+// ✅ 日期變更 → 載入時間
 dateSelect.addEventListener("change", () => {
   timeSelect.innerHTML = '<option value="">請選擇時間</option>';
   const date = dateSelect.value;
@@ -173,14 +169,19 @@ dateSelect.addEventListener("change", () => {
     });
 });
 
+// ✅【重點修正】不要直接用 name.value
 function submitForm() {
-  msg.textContent = "";
+  const nameEl = document.getElementById("name");
+  const phoneEl = document.getElementById("phone");
+  const paycodeEl = document.getElementById("paycode");
+
   msg.className = "message";
+  msg.textContent = "";
 
   const data = {
-    name: name.value.trim(),
-    phone: phone.value.trim(),
-    paycode: paycode.value.trim(),
+    name: nameEl.value.trim(),
+    phone: phoneEl.value.trim(),
+    paycode: paycodeEl.value.trim(),
     date: dateSelect.value,
     time: timeSelect.value
   };
