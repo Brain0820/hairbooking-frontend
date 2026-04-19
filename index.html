@@ -15,7 +15,6 @@
   --hint: #9a8f84;
 }
 
-/* ===== 基本樣式 ===== */
 * {
   box-sizing: border-box;
   font-family: "Noto Sans TC","Microsoft JhengHei",sans-serif;
@@ -192,6 +191,16 @@ function closeModal(){
   modal.style.display = "none";
 }
 
+/* ✅ 重置表單（成功後用） */
+function resetForm(){
+  nameEl.value = "";
+  phoneEl.value = "";
+  paycodeEl.value = "";
+  dateSelect.value = "";
+  timeSelect.innerHTML = "<option value=''>請先選擇日期</option>";
+}
+
+/* 日期顯示 */
 function formatDateLabel(iso){
   const d = new Date(iso);
   const m = d.getMonth() + 1;
@@ -199,7 +208,7 @@ function formatDateLabel(iso){
   return `${m}月${day}日（${WEEKDAY[d.getDay()]}）`;
 }
 
-/* ===== 載入日期（✅ 修正點） ===== */
+/* 載入日期 */
 showLoading();
 fetch(`${BACKEND}/available-dates`)
   .then(r => r.json())
@@ -207,13 +216,13 @@ fetch(`${BACKEND}/available-dates`)
     list.forEach(d => {
       const opt = document.createElement("option");
       opt.value = d.value;
-      opt.textContent = formatDateLabel(d.value); // ✅ 正解
+      opt.textContent = formatDateLabel(d.value);
       dateSelect.appendChild(opt);
     });
   })
   .finally(() => hideLoading());
 
-/* ===== 日期 → 時間 ===== */
+/* 日期 → 時間 */
 dateSelect.addEventListener("change", () => {
   timeSelect.innerHTML = "<option value=''>請先選擇日期</option>";
   if (!dateSelect.value) return;
@@ -239,7 +248,7 @@ dateSelect.addEventListener("change", () => {
     .finally(() => hideLoading());
 });
 
-/* ===== 確認送出 ===== */
+/* 確認 */
 function prepareConfirm(){
   const name = nameEl.value.trim();
   const phone = phoneEl.value.trim();
@@ -266,7 +275,7 @@ function prepareConfirm(){
   `);
 }
 
-/* ===== 送出 ===== */
+/* ✅ 送出成功後 → 清空表單 */
 function submit(){
   showLoading();
   fetch(`${BACKEND}/reserve`,{
@@ -281,7 +290,11 @@ function submit(){
     })
   })
   .then(r=>r.json())
-  .then(()=>showModal("<p>✅ 預約成功</p><button onclick='closeModal()'>確定</button>"))
+  .then(()=>{
+    showModal(
+      "<p>✅ 預約成功</p><button onclick='closeModal(); resetForm();'>確定</button>"
+    );
+  })
   .finally(()=>hideLoading());
 }
 </script>
