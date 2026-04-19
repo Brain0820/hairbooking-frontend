@@ -13,6 +13,8 @@
   --primary-dark: #9c7350;
   --text: #4a3b2c;
   --hint: #9a8f84;
+
+  /* 匯款資訊用 */
   --bank-bg: rgba(244,236,228,0.6);
   --bank-border: #d8c9b8;
 }
@@ -65,7 +67,20 @@ input, select {
   color: var(--hint);
 }
 
-/* ===== 匯款資訊 ===== */
+button {
+  width:100%;
+  margin-top: clamp(22px, 6vw, 28px);
+  padding: clamp(12px, 4vw, 14px);
+  background:var(--primary);
+  border:none;
+  border-radius: clamp(14px, 4vw, 16px);
+  font-size: clamp(15px, 4vw, 17px);
+  color:white;
+  cursor:pointer;
+}
+button:hover { background: var(--primary-dark); }
+
+/* ===== 匯款資訊區塊（只新增這段） ===== */
 .bank-info {
   margin-top: 24px;
   padding: 14px 16px;
@@ -92,19 +107,6 @@ input, select {
   font-size: 12px;
   color: var(--hint);
 }
-
-button {
-  width:100%;
-  margin-top: clamp(22px, 6vw, 28px);
-  padding: clamp(12px, 4vw, 14px);
-  background:var(--primary);
-  border:none;
-  border-radius: clamp(14px, 4vw, 16px);
-  font-size: clamp(15px, 4vw, 17px);
-  color:white;
-  cursor:pointer;
-}
-button:hover { background: var(--primary-dark); }
 
 /* ===== Modal ===== */
 .modal {
@@ -147,7 +149,9 @@ button:hover { background: var(--primary-dark); }
   border-radius:50%;
   animation:spin 1s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 </style>
 </head>
 
@@ -180,12 +184,12 @@ button:hover { background: var(--primary-dark); }
   </select>
   <div class="hint">請先選擇日期後再選時間</div>
 
-  <!-- ✅ 匯款資訊區塊 -->
+  <!-- ✅ 只新增這一塊 -->
   <div class="bank-info">
     <div class="bank-title">匯款資訊</div>
     <div class="bank-row">銀行：永豐銀行（807）</div>
     <div class="bank-row">帳號：14101800063837</div>
-    <div class="bank-note">※ 請完成匯款後，填寫上方「匯款後 5 碼」</div>
+    <div class="bank-note">※ 請完成匯款後，再填寫上方「匯款後 5 碼」</div>
   </div>
 
   <button onclick="prepareConfirm()">送出預約</button>
@@ -202,7 +206,7 @@ button:hover { background: var(--primary-dark); }
 </div>
 
 <script>
-/* ✅ JS 與你目前版本完全相同，不需任何改動 */
+/* ✅ JS 完全不動，保持你目前可以正常運作的版本 */
 </script>
 
 </body>
