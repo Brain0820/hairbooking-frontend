@@ -1,7 +1,4 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
+<!DOCTYPE html><!DOCTYPE htmlUTF-8">
 <title>★琉光販賣所-日系編髮線上預約★</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -181,6 +178,8 @@ button:hover { background: var(--primary-dark); }
     <div class="bank-row">銀行：永豐銀行（807）</div>
     <div class="bank-row">帳號：14101800063837</div>
     <div class="bank-note">※ 完成匯款後，請填寫上方匯款後5碼</div>
+    <div class="bank-note">匯款完成請私訊 kirariri studio 確認</div>
+    <div class="bank-note">IG：kirariri_studio</div>
   </div>
 
   <button onclick="prepareConfirm()">送出預約</button>
@@ -281,16 +280,16 @@ function prepareConfirm(){
     return showModal("<p>請完整填寫所有欄位</p><button onclick='closeModal()'>確定</button>");
 
   if(!/^\d{10}$/.test(phone))
-    return showModal("<p>電話需為 10 碼數字</p><button onclick='closeModal()'>確定</button>");
+    return showModal("<p>電話需為10碼數字</p><button onclick='closeModal()'>確定</button>");
 
   if(!/^\d{5}$/.test(pay))
-    return showModal("<p>匯款後 5 碼需為 5 位數</p><button onclick='closeModal()'>確定</button>");
+    return showModal("<p>匯款後5碼需為5位數</p><button onclick='closeModal()'>確定</button>");
 
   showModal(`
     <p style="font-weight:bold">請確認預約資訊</p>
     <p>姓名：${name}</p>
     <p>電話：${phone}</p>
-    <p>匯款後 5 碼：${pay}</p>
+    <p>匯款後5碼：${pay}</p>
     <p>日期：${dateSelect.options[dateSelect.selectedIndex].text}</p>
     <p>時間：${timeSelect.value}</p>
     <button onclick="submit()">確認送出</button>
@@ -321,3 +320,5 @@ function submit(){
 
 </body>
 </html>
+<html lang="zh-TW">
+<head>
