@@ -1,211 +1,238 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <title>線上預約</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<title>★琉光販賣所-日系編髮線上預約★</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    :root {
-      --bg: #f6f1eb;
-      --card: #fffaf4;
-      --border: #e4d9cf;
-      --primary: #b48a63;
-      --primary-dark: #9c7350;
-      --text: #4a3b2c;
-      --muted: #8a7a6a;
-    }
+<style>
+:root {
+  --bg: #f6f1eb;
+  --card: #fffaf4;
+  --primary: #b48a63;
+  --primary-dark: #9c7350;
+  --text: #4a3b2c;
+}
 
-    * {
-      box-sizing: border-box;
-      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-    }
+* {
+  box-sizing: border-box;
+  font-family: "Noto Sans TC","Microsoft JhengHei",sans-serif;
+}
 
-    body {
-      margin: 0;
-      padding: 40px 16px;
-      background: var(--bg);
-      color: var(--text);
-    }
+body {
+  background: var(--bg);
+  padding: 40px 16px;
+  color: var(--text);
+}
 
-    .container {
-      max-width: 420px;
-      margin: auto;
-      background: var(--card);
-      padding: 28px 24px 32px;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-    }
+.container {
+  max-width: 420px;
+  margin: auto;
+  background: var(--card);
+  padding: 28px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
 
-    h2 {
-      text-align: center;
-      margin-bottom: 24px;
-      font-size: 22px;
-      letter-spacing: 1px;
-    }
+h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 22px;
+}
 
-    label {
-      display: block;
-      margin-top: 18px;
-      margin-bottom: 6px;
-      font-size: 14px;
-      color: var(--muted);
-    }
+label {
+  display:block;
+  margin-top:16px;
+  font-size:14px;
+}
 
-    input, select {
-      width: 100%;
-      font-size: 16px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #fff;
-    }
+input, select {
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  font-size:16px;
+}
 
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(180,138,99,0.15);
-    }
+button {
+  width:100%;
+  margin-top:26px;
+  padding:14px;
+  background:var(--primary);
+  border:none;
+  border-radius:16px;
+  font-size:17px;
+  color:white;
+  cursor:pointer;
+}
 
-    button {
-      width: 100%;
-      margin-top: 28px;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 16px;
-      padding: 14px;
-      font-size: 17px;
-      cursor: pointer;
-    }
+button:hover { background: var(--primary-dark); }
 
-    .message {
-      margin-top: 16px;
-      text-align: center;
-      font-size: 14px;
-    }
-
-    .error { color: #c0392b; }
-    .success { color: #218c53; }
-  </style>
+/* ===== Modal ===== */
+.modal {
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.45);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+.modal-box {
+  background:white;
+  padding:26px;
+  border-radius:16px;
+  max-width:340px;
+  width:90%;
+  text-align:center;
+}
+.modal-box p {
+  font-size:16px;
+  margin:10px 0;
+}
+.modal-box button {
+  margin-top:12px;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
-  <h2>線上預約</h2>
+  <h2>琉光販賣所編髮活動預約</h2>
 
   <label>姓名</label>
-  <input id="name" placeholder="請輸入姓名">
+  <input id="name">
 
-  <label>電話</label>
-  <input id="phone" placeholder="0912345678" maxlength="10">
+  <label>電話（10 碼）</label>
+  <input id="phone" maxlength="10">
 
   <label>匯款後 5 碼</label>
-  <input id="paycode" placeholder="12345" maxlength="5">
+  <input id="paycode" maxlength="5">
 
   <label>日期</label>
-  <select id="dateSelect">
-    <option value="">請選擇可預約日期</option>
-  </select>
+  <select id="dateSelect"><option value="">請選擇日期</option></select>
 
   <label>時間</label>
-  <select id="timeSelect">
-    <option value="">請先選擇日期</option>
-  </select>
+  <select id="timeSelect"><option value="">請選擇時間</option></select>
 
-  <button onclick="submitForm()">送出預約</button>
+  <button onclick="prepareConfirm()">送出預約</button>
+</div>
 
-  <div class="message" id="message"></div>
+<!-- Message Box / Confirm -->
+<div class="modal" id="modal">
+  <div class="modal-box" id="modalBox"></div>
 </div>
 
 <script>
 const BACKEND = "https://hairbooking-backend.onrender.com";
 const WEEKDAY = ["日","一","二","三","四","五","六"];
 
+const modal = document.getElementById("modal");
+const modalBox = document.getElementById("modalBox");
 const dateSelect = document.getElementById("dateSelect");
 const timeSelect = document.getElementById("timeSelect");
-const msg = document.getElementById("message");
 
-// ✅ 產生「固定寬度日期 + 星期」
+// ===== 工具 =====
+function showModal(html) {
+  modalBox.innerHTML = html;
+  modal.style.display = "flex";
+}
+function closeModal() {
+  modal.style.display = "none";
+}
 function formatDateLabel(isoDate) {
   const d = new Date(isoDate);
   const m = d.getMonth() + 1;
-  const day = String(d.getDate()).padStart(2, "0"); // ✅ 補 0
+  const day = String(d.getDate()).padStart(2,"0");
   const w = WEEKDAY[d.getDay()];
   return `${m}月${day}日（${w}）`;
 }
+function resetForm() {
+  document.querySelectorAll("input").forEach(i => i.value = "");
+  dateSelect.value = "";
+  timeSelect.innerHTML = "<option>請選擇時間</option>";
+  closeModal();
+}
 
-// ✅ 載入日期
+// ===== 載入日期 =====
 fetch(`${BACKEND}/available-dates`)
-  .then(r => r.json())
-  .then(list => {
-    list.forEach(d => {
-      const opt = document.createElement("option");
-      opt.value = d.value;
-      opt.textContent = formatDateLabel(d.value);
-      dateSelect.appendChild(opt);
-    });
+.then(r=>r.json())
+.then(list=>{
+  list.forEach(d=>{
+    const o=document.createElement("option");
+    o.value=d.value;
+    o.textContent=formatDateLabel(d.value);
+    dateSelect.appendChild(o);
   });
-
-// ✅ 日期選擇 → 載入時間
-dateSelect.addEventListener("change", () => {
-  timeSelect.innerHTML = '<option value="">請選擇時間</option>';
-  const date = dateSelect.value;
-  if (!date) return;
-
-  fetch(`${BACKEND}/available-times?date=${date}`)
-    .then(r => r.json())
-    .then(times => {
-      if (times.length === 0) {
-        const opt = document.createElement("option");
-        opt.textContent = "此日已額滿";
-        opt.disabled = true;
-        timeSelect.appendChild(opt);
-        return;
-      }
-
-      times.forEach(t => {
-        const opt = document.createElement("option");
-        opt.value = t;
-        opt.textContent = t;
-        timeSelect.appendChild(opt);
-      });
-    });
 });
 
-// ✅ 送出
-function submitForm() {
+// ===== 載入時間 =====
+dateSelect.onchange=()=>{
+  timeSelect.innerHTML="<option>請選擇時間</option>";
+  if(!dateSelect.value) return;
+  fetch(`${BACKEND}/available-times?date=${dateSelect.value}`)
+  .then(r=>r.json())
+  .then(times=>{
+    if(!times.length){
+      const o=document.createElement("option");
+      o.textContent="此日已額滿";
+      o.disabled=true;
+      timeSelect.appendChild(o);
+      return;
+    }
+    times.forEach(t=>{
+      const o=document.createElement("option");
+      o.value=t;o.textContent=t;
+      timeSelect.appendChild(o);
+    });
+  });
+};
+
+// ===== 確認流程 =====
+function prepareConfirm(){
   const name = document.getElementById("name").value.trim();
   const phone = document.getElementById("phone").value.trim();
   const paycode = document.getElementById("paycode").value.trim();
 
-  if (!name || !phone || !paycode || !dateSelect.value || !timeSelect.value) {
-    msg.textContent = "請完整填寫所有欄位";
-    msg.className = "message error";
-    return;
-  }
+  if(!name||!phone||!paycode||!dateSelect.value||!timeSelect.value)
+    return showModal("<p>請完整填寫所有欄位</p><button onclick='closeModal()'>確定</button>");
 
-  msg.textContent = "送出預約中…";
+  if(!/^\d{10}$/.test(phone))
+    return showModal("<p>電話需為 10 碼數字</p><button onclick='closeModal()'>確定</button>");
 
-  fetch(`${BACKEND}/reserve`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name, phone, paycode,
-      date: dateSelect.value,
-      time: timeSelect.value
+  if(!/^\d{5}$/.test(paycode))
+    return showModal("<p>匯款後 5 碼需為 5 位數字</p><button onclick='closeModal()'>確定</button>");
+
+  showModal(`
+    <p style="font-weight:bold">請確認預約資訊</p>
+    <p>姓名：${name}</p>
+    <p>電話：${phone}</p>
+    <p>匯款後 5 碼：<strong>${paycode}</strong></p>
+    <p>日期：${dateSelect.options[dateSelect.selectedIndex].text}</p>
+    <p>時間：${timeSelect.value}</p>
+    <button onclick="submit()">確認送出</button>
+    <button onclick="resetForm()">取消</button>
+  `);
+}
+
+// ===== 最後送出 =====
+function submit(){
+  fetch(`${BACKEND}/reserve`,{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      name:name.value,
+      phone:phone.value,
+      paycode:paycode.value,
+      date:dateSelect.value,
+      time:timeSelect.value
     })
   })
-  .then(async r => {
-    const j = await r.json();
-    if (!r.ok) throw j;
-    msg.textContent = "✅ 預約成功";
-    msg.className = "message success";
-  })
-  .catch(err => {
-    msg.textContent = err.detail || "預約失敗";
-    msg.className = "message error";
+  .then(r=>r.json())
+  .then(()=>{
+    showModal("<p>✅ 預約成功</p><button onclick='closeModal()'>確定</button>");
   });
 }
 </script>
