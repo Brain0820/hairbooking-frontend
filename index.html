@@ -2,100 +2,125 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <title>線上預約系統</title>
+  <title>線上預約</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
+    :root {
+      --bg: #f6f1eb;
+      --card: #fffaf4;
+      --border: #e4d9cf;
+      --primary: #b48a63;
+      --primary-dark: #9c7350;
+      --text: #4a3b2c;
+      --muted: #8a7a6a;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    }
+
     body {
-      font-family: "Microsoft JhengHei", Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 30px;
+      margin: 0;
+      padding: 40px 16px;
+      background: var(--bg);
+      color: var(--text);
     }
 
     .container {
       max-width: 420px;
       margin: auto;
-      background: #fff;
-      padding: 25px;
-      border-radius: 8px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      background: var(--card);
+      padding: 28px 24px 32px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 25px;
+      margin-bottom: 24px;
+      font-size: 22px;
+      letter-spacing: 1px;
     }
 
     label {
-      margin-top: 12px;
       display: block;
-      font-weight: bold;
+      margin-top: 18px;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: var(--muted);
     }
 
-    input, select, button {
+    input, select {
       width: 100%;
       font-size: 16px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(180,138,99,0.15);
+    }
+
+    select option {
       padding: 10px;
-      margin-top: 6px;
     }
 
     button {
-      margin-top: 20px;
-      background: #007bff;
+      width: 100%;
+      margin-top: 28px;
+      background: var(--primary);
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 17px;
       cursor: pointer;
+      transition: background 0.2s ease;
     }
 
     button:hover {
-      background: #0056b3;
+      background: var(--primary-dark);
     }
 
     .message {
-      margin-top: 15px;
+      margin-top: 16px;
       text-align: center;
-      font-weight: bold;
+      font-size: 14px;
     }
+
+    .error { color: #c0392b; }
+    .success { color: #218c53; }
   </style>
 </head>
+
 <body>
 
 <div class="container">
   <h2>線上預約</h2>
 
   <label>姓名</label>
-  <input id="name" type="text" required>
+  <input id="name" placeholder="請輸入姓名">
 
   <label>電話</label>
-  <input id="phone" type="tel" maxlength="10" placeholder="0912345678">
+  <input id="phone" placeholder="0912345678" maxlength="10">
 
   <label>匯款後 5 碼</label>
-  <input id="paycode" type="text" maxlength="5" placeholder="12345">
+  <input id="paycode" placeholder="12345" maxlength="5">
 
   <label>日期</label>
-  <input id="date" type="date">
+  <select id="dateSelect">
+    <option value="">請選擇可預約日期</option>
+  </select>
 
   <label>時間</label>
-  <select id="time">
-    <option>12:00</option>
-    <option>12:20</option>
-    <option>12:40</option>
-    <option>13:00</option>
-    <option>13:20</option>
-    <option>13:40</option>
-    <option>14:00</option>
-    <option>14:20</option>
-    <option>14:40</option>
-    <option>15:00</option>
-    <option>15:20</option>
-    <option>15:40</option>
-    <option>16:00</option>
-    <option>16:20</option>
-    <option>16:40</option>
-    <option>17:00</option>
-    <option>17:20</option>
-    <option>17:40</option>
-    <option>18:00</option>
+  <select id="timeSelect">
+    <option value="">請先選擇日期</option>
   </select>
 
   <button onclick="submitForm()">送出預約</button>
@@ -104,55 +129,87 @@
 </div>
 
 <script>
-function submitForm() {
-  const name = document.getElementById("name").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const paycode = document.getElementById("paycode").value.trim();
-  const date = document.getElementById("date").value;
-  const time = document.getElementById("time").value;
-  const msg = document.getElementById("message");
+const BACKEND = "https://hairbooking-backend.onrender.com";
 
-  // 簡單前台檢查（輔助用）
-  if (!name || !phone || !paycode || !date || !time) {
-    msg.style.color = "red";
-    msg.innerText = "請填寫所有欄位";
+const dateSelect = document.getElementById("dateSelect");
+const timeSelect = document.getElementById("timeSelect");
+const msg = document.getElementById("message");
+
+// 載入可預約日期
+fetch(`${BACKEND}/available-dates`)
+  .then(r => r.json())
+  .then(list => {
+    list.forEach(d => {
+      const opt = document.createElement("option");
+      opt.value = d.value;
+      opt.textContent = d.label;
+      dateSelect.appendChild(opt);
+    });
+  });
+
+// 日期變更 → 載入時間
+dateSelect.addEventListener("change", () => {
+  timeSelect.innerHTML = '<option value="">請選擇時間</option>';
+  const date = dateSelect.value;
+  if (!date) return;
+
+  fetch(`${BACKEND}/available-times?date=${date}`)
+    .then(r => r.json())
+    .then(times => {
+      if (times.length === 0) {
+        const opt = document.createElement("option");
+        opt.textContent = "此日已額滿";
+        opt.disabled = true;
+        timeSelect.appendChild(opt);
+        return;
+      }
+
+      times.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        timeSelect.appendChild(opt);
+      });
+    });
+});
+
+function submitForm() {
+  msg.textContent = "";
+  msg.className = "message";
+
+  const data = {
+    name: name.value.trim(),
+    phone: phone.value.trim(),
+    paycode: paycode.value.trim(),
+    date: dateSelect.value,
+    time: timeSelect.value
+  };
+
+  if (!data.name || !data.phone || !data.paycode || !data.date || !data.time) {
+    msg.textContent = "請完整填寫所有欄位";
+    msg.classList.add("error");
     return;
   }
 
-  msg.style.color = "blue";
-  msg.innerText = "送出預約中...";
+  msg.textContent = "送出預約中…";
 
-  fetch("https://hairbooking-backend.onrender.com/reserve", {
+  fetch(`${BACKEND}/reserve`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      name: name,
-      phone: phone,
-      paycode: paycode,
-      date: date,
-      time: time
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
   })
   .then(async res => {
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.detail || "預約失敗");
-    }
-    return data;
-  })
-  .then(data => {
-    msg.style.color = "green";
-    msg.innerText = data.message || "✅ 預約成功";
+    const j = await res.json();
+    if (!res.ok) throw j;
+    msg.textContent = "✅ 預約成功";
+    msg.className = "message success";
   })
   .catch(err => {
-    msg.style.color = "red";
-    msg.innerText = err.message;
+    msg.textContent = err.detail || "預約失敗";
+    msg.className = "message error";
   });
 }
 </script>
-
 
 </body>
 </html>
